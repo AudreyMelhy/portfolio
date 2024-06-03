@@ -17,7 +17,7 @@ pipeline {
         timestamps()
     }
     parameters {
-        string(name: 'BRANCH_NAME', defaultValue: 'main', description: '')
+        string(name: 'BRANCH_NAME', defaultValue: '', description: '')
         // string(name: 'UI_IMAGE_TAG', defaultValue: 'latest', description: '')
         // string(name: 'AUTH_IMAGE_TAG', defaultValue: 'latest', description: '')
         // string(name: 'WEATHER_IMAGE_TAG', defaultValue: 'latest', description: '')
