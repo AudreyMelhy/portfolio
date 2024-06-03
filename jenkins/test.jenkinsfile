@@ -25,6 +25,13 @@ pipeline {
         // string(name: 'DB_IMAGE_TAG', defaultValue: 'latest', description: '')
     }
     stages {
+        stage('Sanity Check') {
+            steps {
+                script{
+                   sanity_check() 
+                }
+            }
+        }
         stage('Checkout') {
             steps {
                 dir("${WORKSPACE}/code") {
@@ -42,18 +49,18 @@ pipeline {
                 }
             }
         }
-        stage('SonarQube Analysis') {
-            steps {
-                dir("${WORKSPACE}/code") {
-                    script {
-                        withSonarQubeEnv('SonarScanner') {
-                            sh "sonar-scanner"
-                            // sh "sonar-scanner --version"
-                        }
-                    }
-                }
-            }
-        }
+        // stage('SonarQube Analysis') {
+        //     steps {
+        //         dir("${WORKSPACE}/code") {
+        //             script {
+        //                 withSonarQubeEnv('SonarScanner') {
+        //                     sh "sonar-scanner"
+        //                     // sh "sonar-scanner --version"
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
         stage('Building Auth') {
             steps {
                 script {
@@ -168,4 +175,10 @@ pipeline {
             )
         }   
     }
+}
+def sanity_check() {
+    if (params.BRANCH_NAME.isEmpty()){
+       echo "The parameter BRANCH_NAME is not set"
+       sh 'exit 2'
+   } 
 }
