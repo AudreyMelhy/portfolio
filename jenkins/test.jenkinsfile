@@ -42,12 +42,60 @@ pipeline {
                 }
             }
         }
-        stage('run') {
+        stage('Building Auth') {
             steps {
                 script {
                     dir("${WORKSPACE}/code/code/auth") {
                         sh """
-                            ls -la
+                            cat Dockerfile
+                            docker images
+                        """
+                    }
+                }
+            }
+        }
+        stage('Building db') {
+            steps {
+                script {
+                    dir("${WORKSPACE}/code/code/db") {
+                        sh """
+                            cat Dockerfile
+                            docker images
+                        """
+                    }
+                }
+            }
+        }
+        stage('Building redis') {
+            steps {
+                script {
+                    dir("${WORKSPACE}/code/code/redis") {
+                        sh """
+                            cat Dockerfile
+                            docker images
+                        """
+                    }
+                }
+            }
+        }
+        stage('Building ui') {
+            steps {
+                script {
+                    dir("${WORKSPACE}/code/code/ui") {
+                        sh """
+                            cat Dockerfile
+                            docker images
+                        """
+                    }
+                }
+            }
+        }
+        stage('Building weather') {
+            steps {
+                script {
+                    dir("${WORKSPACE}/code/code/weather") {
+                        sh """
+                            cat Dockerfile
                             docker images
                         """
                     }
