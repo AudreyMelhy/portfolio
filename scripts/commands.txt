@@ -1,0 +1,4 @@
+to run a script
+create an alias for ex
+alias clean="bash ~/path/to/file/clean.sh"
+alias git="bash ~/path/to/file/git.sh"

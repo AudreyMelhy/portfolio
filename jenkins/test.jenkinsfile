@@ -1,0 +1,58 @@
+pipeline {
+    agent {
+        label 'SERVER01'
+    }
+    triggers {
+        githubPush()
+    }
+    environment {
+        DOCKER_HUB_REGISTRY = "s5audrey"
+        DOCKER_CREDENTIAL_ID = 'audreymelhy-docker-hub-auth'
+    }
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '7'))
+        skipDefaultCheckout(true)
+        disableConcurrentBuilds()
+        timeout(time: 30, unit: 'MINUTES')
+        timestamps()
+    }
+    parameters {
+        string(name: 'BRANCH_NAME', defaultValue: 'main', description: '')
+        // string(name: 'UI_IMAGE_TAG', defaultValue: 'latest', description: '')
+        // string(name: 'AUTH_IMAGE_TAG', defaultValue: 'latest', description: '')
+        // string(name: 'WEATHER_IMAGE_TAG', defaultValue: 'latest', description: '')
+        // string(name: 'REDIS_IMAGE_TAG', defaultValue: 'latest', description: '')
+        // string(name: 'DB_IMAGE_TAG', defaultValue: 'latest', description: '')
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                dir("${WORKSPACE}/code") {
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: "*/${params.BRANCH_NAME}"]],
+                        doGenerateSubmoduleConfigurations: false,
+                        extensions: [[$class: 'LocalBranch']],
+                        submoduleCfg: [],
+                        userRemoteConfigs: [[
+                            url: 'https://github.com/AudreyMelhy/the-weather-app.git',
+                            credentialsId: 'audrey-github-auth'
+                        ]]
+                    ])
+                }
+            }
+        }
+        stage('Test') {
+            steps {
+                script {
+                    dir("${WORKSPACE}/code") {
+                        sh """
+                            ls -la
+                        """
+                    }
+                }
+            }
+        }
+    }
+}
+    
