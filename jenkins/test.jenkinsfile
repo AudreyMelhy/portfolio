@@ -67,7 +67,7 @@ pipeline {
                     dir("${WORKSPACE}/code/code/auth") {
                         sh """
                             cat Dockerfile
-                            docker images
+                           
                         """
                     }
                 }
@@ -79,7 +79,7 @@ pipeline {
                     dir("${WORKSPACE}/code/code/db") {
                         sh """
                             cat Dockerfile
-                            docker images
+  
                         """
                     }
                 }
@@ -91,7 +91,7 @@ pipeline {
                     dir("${WORKSPACE}/code/code/redis") {
                         sh """
                             cat Dockerfile
-                            docker images
+                     
                         """
                     }
                 }
@@ -103,7 +103,7 @@ pipeline {
                     dir("${WORKSPACE}/code/code/ui") {
                         sh """
                             cat Dockerfile
-                            docker images
+                      
                         """
                     }
                 }
@@ -115,26 +115,26 @@ pipeline {
                     dir("${WORKSPACE}/code/code/weather") {
                         sh """
                             cat Dockerfile
-                            docker images
+                   
                         """
                     }
                 }
             }
         }
-        stage("Login Into Docker Hub"){
-             steps {
-              withCredentials([
-                usernamePassword(credentialsId: 'audreymelhy-docker-hub-auth', 
-                usernameVariable: 'DOCKER_HUB_REGISTRY', 
-                passwordVariable: 'DOCKER_CREDENTIAL_ID')]) {
-                  sh """
-                    sudo docker logout
-                    sudo docker login -u ${DOCKER_HUB_REGISTRY} -p ${DOCKER_CREDENTIAL_ID}
-                  """
+        // stage("Login Into Docker Hub"){
+        //      steps {
+        //       withCredentials([
+        //         usernamePassword(credentialsId: 'audreymelhy-docker-hub-auth', 
+        //         usernameVariable: 'DOCKER_HUB_REGISTRY', 
+        //         passwordVariable: 'DOCKER_CREDENTIAL_ID')]) {
+        //           sh """
+        //             sudo docker logout
+        //             sudo docker login -u ${DOCKER_HUB_REGISTRY} -p ${DOCKER_CREDENTIAL_ID}
+        //           """
                   
-                }
-            }
-        }
+        //         }
+        //     }
+        // }
         stage('Login to Docker Hub') {
             steps {
                 script {
@@ -153,7 +153,7 @@ pipeline {
                     dir("${WORKSPACE}/code/code/weather") {
                         sh """
                             cat Dockerfile
-                            docker images
+                           
                         """
                     }
                 }
