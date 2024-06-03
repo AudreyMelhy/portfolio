@@ -42,11 +42,12 @@ pipeline {
                 }
             }
         }
-        stage('Test') {
+        stage('run') {
             steps {
                 script {
                     dir("${WORKSPACE}/code/auth") {
                         sh """
+                            ls -la
                             cat Dockerfile
                         """
                     }
