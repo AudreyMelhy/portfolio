@@ -45,7 +45,7 @@ pipeline {
         stage('run') {
             steps {
                 script {
-                    dir("${WORKSPACE}/code/auth") {
+                    dir("${WORKSPACE}/code/code/auth") {
                         sh """
                             ls -la
                             cat Dockerfile
