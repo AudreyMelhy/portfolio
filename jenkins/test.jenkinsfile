@@ -64,9 +64,9 @@ pipeline {
         stage("Set Credentials"){
              steps {
               withCredentials([
-                // string (credentialsId: 'WEATHERAPP_REDIS_PASSWORD', 
-                // // variable: 'REDIS_USER', 
-                // variable: 'REDIS_PASSWORD'),
+                string (credentialsId: 'weatherapp-redis-auth', 
+                usernameVariable: 'REDIS_USERNAME', 
+                usernameVariable: 'REDIS_PASSWORD'),
 
                 string(credentialsId: 'WEATHERAPP_APIKEY', 
                 variable: 'APIKEY')]) {
