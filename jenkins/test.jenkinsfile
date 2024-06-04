@@ -64,7 +64,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 dir("${WORKSPACE}/app/code") {
-                    docker.image("${env.DOCKER_HUB_REGISTRY}/weatherapp-sonar-scanner:${params.IMAGE_TAG}").inside('-u 0:0') {
+                    docker.image("s5audrey/weatherapp-sonar-scanner:latest").inside('-u 0:0') {
                         withSonarQubeEnv('SonarScanner') {
                             sh """
                                     ls -l 
