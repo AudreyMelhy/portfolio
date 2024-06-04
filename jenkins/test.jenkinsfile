@@ -61,6 +61,33 @@ pipeline {
                 }
             }
         }
+        stage("Build"){
+             steps {
+              withCredentials([
+                usernamePassword(credentialsId: 'WEATHERAPP_REDIS_PASSWORD', 
+                usernameVariable: 'REDIS_USER', 
+                passwordVariable: 'REDIS_PASSWORD'),
+
+                string(credentialsId: 'WEATHERAPP_APIKEY', 
+                variable: 'APIKEY'),
+
+                string(credentialsId: 'WEATHERAPP_MYSQL_ROOT_PASSWORD', 
+                variable: 'MYSQL_ROOT_PASSWORD'),
+
+                string(credentialsId: 'WEATHERAPP_DB_PASSWORD', 
+                variable: 'DB_PASSWORD')]) {
+
+                    echo "REDIS_USER ${REDIS_USER}"
+                    echo "REDIS_PASSWORD ${REDIS_PASSWORD}"
+                    echo "APIKEY ${APIKEY}"
+                    echo "MYSQL_ROOT_PASSWORD ${MYSQL_ROOT_PASSWORD}"
+                    echo "DB_PASSWORD ${DB_PASSWORD}"
+                    echo "DB_HOST ${DB_HOST}"
+
+                  sh "ls"
+                }
+            }
+        }
         // stage('SonarQube analysis') {
         //     steps {
         //         script {
@@ -85,7 +112,7 @@ pipeline {
                 script {
                     dir("${WORKSPACE}/app/code/auth") {
                         sh """
-                            cat Dockerfile
+                            docker build -t ${env.DOCKER_HUB_REGISTRY}/weatherapp-auth:${params.IMAGE_TAG} .
                            
                         """
                     }
@@ -97,8 +124,7 @@ pipeline {
                 script {
                     dir("${WORKSPACE}/app/code/db") {
                         sh """
-                            cat Dockerfile
-  
+                            docker build -t ${env.DOCKER_HUB_REGISTRY}/weatherapp-db:${params.IMAGE_TAG} .
                         """
                     }
                 }
@@ -109,8 +135,7 @@ pipeline {
                 script {
                     dir("${WORKSPACE}/app/code/redis") {
                         sh """
-                            cat Dockerfile
-                     
+                            docker build -t ${env.DOCKER_HUB_REGISTRY}/weatherapp-redis:${params.IMAGE_TAG} .                     
                         """
                     }
                 }
@@ -121,8 +146,7 @@ pipeline {
                 script {
                     dir("${WORKSPACE}/app/code/ui") {
                         sh """
-                            cat Dockerfile
-                      
+                            docker build -t ${env.DOCKER_HUB_REGISTRY}/weatherapp-ui:${params.IMAGE_TAG} .                     
                         """
                     }
                 }
@@ -133,14 +157,12 @@ pipeline {
                 script {
                     dir("${WORKSPACE}/app/code/weather") {
                         sh """
-                            cat Dockerfile
-                   
+                            docker build -t ${env.DOCKER_HUB_REGISTRY}/weatherapp-weather:${params.IMAGE_TAG} .                  
                         """
                     }
                 }
             }
         }
-
         stage('Login to Docker Hub') {
             steps {
                 script {
@@ -150,9 +172,7 @@ pipeline {
                     }
                 }
             }
-        }
-
-        
+        }        
         stage('Pushing images to dockerhub') {
             steps {
                 script {
