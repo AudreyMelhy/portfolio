@@ -64,24 +64,24 @@ pipeline {
         stage("Set Credentials"){
              steps {
               withCredentials([
-                string (credentialsId: 'weatherapp-redis-auth', 
+                usernamePassword (credentialsId: 'weatherapp-redis-auth', 
                 usernameVariable: 'REDIS_USERNAME', 
                 passwordVariable: 'REDIS_PASSWORD'),
 
                 string(credentialsId: 'WEATHERAPP_APIKEY', 
                 variable: 'APIKEY')]) {
 
-                // string(credentialsId: 'WEATHERAPP_MYSQL_ROOT_PASSWORD', 
-                // variable: 'MYSQL_ROOT_PASSWORD'),
+                string(credentialsId: 'weatherapp-mysql-auth', 
+                variable: 'MYSQL_ROOT_PASSWORD'),
 
-                // string(credentialsId: 'WEATHERAPP_DB_PASSWORD', 
-                // variable: 'DB_PASSWORD')]) {
+                string(credentialsId: 'weatherapp-db-auth', 
+                variable: 'DB_PASSWORD')]) {
 
                     echo "REDIS_USERNAME ${REDIS_USERNAME}"
                     echo "REDIS_PASSWORD ${REDIS_PASSWORD}"
                     echo "APIKEY ${APIKEY}"
-                    // echo "MYSQL_ROOT_PASSWORD ${MYSQL_ROOT_PASSWORD}"
-                    // echo "DB_PASSWORD ${DB_PASSWORD}"
+                    echo "MYSQL_ROOT_PASSWORD ${MYSQL_ROOT_PASSWORD}"
+                    echo "DB_PASSWORD ${DB_PASSWORD}"
                     // echo "DB_HOST ${DB_HOST}"
 
                   sh "ls"
