@@ -69,20 +69,20 @@ pipeline {
                 // variable: 'REDIS_PASSWORD'),
 
                 string(credentialsId: 'WEATHERAPP_APIKEY', 
-                variable: 'APIKEY'),
+                variable: 'APIKEY')]) {
 
-                string(credentialsId: 'WEATHERAPP_MYSQL_ROOT_PASSWORD', 
-                variable: 'MYSQL_ROOT_PASSWORD'),
+                // string(credentialsId: 'WEATHERAPP_MYSQL_ROOT_PASSWORD', 
+                // variable: 'MYSQL_ROOT_PASSWORD'),
 
-                string(credentialsId: 'WEATHERAPP_DB_PASSWORD', 
-                variable: 'DB_PASSWORD')]) {
+                // string(credentialsId: 'WEATHERAPP_DB_PASSWORD', 
+                // variable: 'DB_PASSWORD')]) {
 
                     // echo "REDIS_USER ${REDIS_USER}"
-                    echo "REDIS_PASSWORD ${REDIS_PASSWORD}"
+                    // echo "REDIS_PASSWORD ${REDIS_PASSWORD}"
                     echo "APIKEY ${APIKEY}"
-                    echo "MYSQL_ROOT_PASSWORD ${MYSQL_ROOT_PASSWORD}"
-                    echo "DB_PASSWORD ${DB_PASSWORD}"
-                    echo "DB_HOST ${DB_HOST}"
+                    // echo "MYSQL_ROOT_PASSWORD ${MYSQL_ROOT_PASSWORD}"
+                    // echo "DB_PASSWORD ${DB_PASSWORD}"
+                    // echo "DB_HOST ${DB_HOST}"
 
                   sh "ls"
                 }
