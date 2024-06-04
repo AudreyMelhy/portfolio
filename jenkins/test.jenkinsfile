@@ -49,12 +49,30 @@ pipeline {
                 }
             }
         }
+        stage('Building Sonar Image') {
+            steps {
+                script {
+                    dir("${WORKSPACE}/app/sonar-scanner") {
+                        sh """
+                        docker build -t ${env.DOCKER_HUB_REGISTRY}/weatherapp-sonar-scanner:latest  .
+
+                        """
+                    }
+                }
+            }
+        }
         stage('SonarQube Analysis') {
             steps {
                 dir("${WORKSPACE}/app/code") {
-                    script {
+                    docker.image("s5audrey/weatherapp-sonar-scanner:latest").inside('-u 0:0') {
                         withSonarQubeEnv('SonarScanner') {
-                            sh "sonar"
+                            sh """
+                                    ls -l 
+                                    pwd
+                                    sonar-scanner -v
+                                    sonar-scanner
+                                """
+                            // sh "sonar-scanner"
                             // sh "sonar-scanner --version"
                         }
                     }
