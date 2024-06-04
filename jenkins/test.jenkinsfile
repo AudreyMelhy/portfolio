@@ -69,7 +69,7 @@ pipeline {
                 passwordVariable: 'REDIS_PASSWORD'),
 
                 string(credentialsId: 'WEATHERAPP_APIKEY', 
-                variable: 'APIKEY')]) {
+                variable: 'APIKEY'),
 
                 string(credentialsId: 'weatherapp-mysql-auth', 
                 variable: 'MYSQL_ROOT_PASSWORD'),
