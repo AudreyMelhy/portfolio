@@ -34,7 +34,7 @@ pipeline {
         }
         stage('Checkout') {
             steps {
-                dir("${WORKSPACE}/code") {
+                dir("${WORKSPACE}/app") {
                     checkout([
                         $class: 'GitSCM',
                         branches: [[name: "*/${params.BRANCH_NAME}"]],
@@ -49,22 +49,22 @@ pipeline {
                 }
             }
         }
-        // stage('SonarQube Analysis') {
-        //     steps {
-        //         dir("${WORKSPACE}/code") {
-        //             script {
-        //                 withSonarQubeEnv('SonarScanner') {
-        //                     sh "sonar-scanner"
-        //                     // sh "sonar-scanner --version"
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+        stage('SonarQube Analysis') {
+            steps {
+                dir("${WORKSPACE}/app/code") {
+                    script {
+                        withSonarQubeEnv('SonarScanner') {
+                            sh "sonar-scanner"
+                            // sh "sonar-scanner --version"
+                        }
+                    }
+                }
+            }
+        }
         stage('Building Auth') {
             steps {
                 script {
-                    dir("${WORKSPACE}/code/code/auth") {
+                    dir("${WORKSPACE}/app/code/auth") {
                         sh """
                             cat Dockerfile
                            
@@ -76,7 +76,7 @@ pipeline {
         stage('Building db') {
             steps {
                 script {
-                    dir("${WORKSPACE}/code/code/db") {
+                    dir("${WORKSPACE}/app/code/db") {
                         sh """
                             cat Dockerfile
   
@@ -88,7 +88,7 @@ pipeline {
         stage('Building redis') {
             steps {
                 script {
-                    dir("${WORKSPACE}/code/code/redis") {
+                    dir("${WORKSPACE}/app/code/redis") {
                         sh """
                             cat Dockerfile
                      
@@ -100,7 +100,7 @@ pipeline {
         stage('Building ui') {
             steps {
                 script {
-                    dir("${WORKSPACE}/code/code/ui") {
+                    dir("${WORKSPACE}/app/code/ui") {
                         sh """
                             cat Dockerfile
                       
@@ -112,7 +112,7 @@ pipeline {
         stage('Building weather') {
             steps {
                 script {
-                    dir("${WORKSPACE}/code/code/weather") {
+                    dir("${WORKSPACE}/app/code/weather") {
                         sh """
                             cat Dockerfile
                    
@@ -121,20 +121,7 @@ pipeline {
                 }
             }
         }
-        // stage("Login Into Docker Hub"){
-        //      steps {
-        //       withCredentials([
-        //         usernamePassword(credentialsId: 'audreymelhy-docker-hub-auth', 
-        //         usernameVariable: 'DOCKER_HUB_REGISTRY', 
-        //         passwordVariable: 'DOCKER_CREDENTIAL_ID')]) {
-        //           sh """
-        //             sudo docker logout
-        //             sudo docker login -u ${DOCKER_HUB_REGISTRY} -p ${DOCKER_CREDENTIAL_ID}
-        //           """
-                  
-        //         }
-        //     }
-        // }
+
         stage('Login to Docker Hub') {
             steps {
                 script {
@@ -150,7 +137,7 @@ pipeline {
         stage('Pushing images to dockerhub') {
             steps {
                 script {
-                    dir("${WORKSPACE}/code/code/weather") {
+                    dir("${WORKSPACE}/app/code/weather") {
                         sh """
                             cat Dockerfile
                            
@@ -162,7 +149,7 @@ pipeline {
         stage('Clean Up') {
             steps {
                 script {
-                    dir("${WORKSPACE}/code/code") {
+                    dir("${WORKSPACE}/code/app") {
                         sh """
                             rm -rf *
                         """
