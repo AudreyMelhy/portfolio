@@ -167,8 +167,11 @@ pipeline {
             steps {
                 script {
                     // Login to Docker Hub
-                    withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIAL_ID, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        sh "echo \$DOCKER_PASSWORD | docker login -u \$DOCKER_USERNAME --password-stdin"
+                    withCredentials([usernamePassword(credentialsId: 'audreymelhy-docker-hub-auth', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        // sh "echo \$DOCKER_PASSWORD | docker login -u \$DOCKER_USERNAME --password-stdin"
+                        sh """
+                            docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+                        """    
                     }
                 }
             }
@@ -178,7 +181,7 @@ pipeline {
                 script {
                     dir("${WORKSPACE}/app/code/weather") {
                         sh """
-                            cat Dockerfile
+                            ls -la
                            
                         """
                     }
