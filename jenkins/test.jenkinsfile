@@ -61,24 +61,24 @@ pipeline {
                 }
             }
         }
-        stage('SonarQube analysis') {
-            steps {
-                script {
-                    dir("${WORKSPACE}/app") {
-                        docker.image("s5audrey/weatherapp-sonar-scanner:latest").inside('-u 0:0') {
-                            withSonarQubeEnv('SonarScanner') {
-                                sh """
-                                    ls -l 
-                                    pwd
-                                    sonar-scanner --version
-                                    // sonar-scanner
-                                """
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        // stage('SonarQube analysis') {
+        //     steps {
+        //         script {
+        //             dir("${WORKSPACE}/app") {
+        //                 docker.image("s5audrey/weatherapp-sonar-scanner:latest").inside('-u 0:0') {
+        //                     withSonarQubeEnv('SonarScanner') {
+        //                         sh """
+        //                             ls -l 
+        //                             pwd
+        //                             sonar-scanner --version
+        //                             // sonar-scanner
+        //                         """
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
         stage('Building Auth') {
             steps {
