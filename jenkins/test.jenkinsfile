@@ -77,7 +77,7 @@ pipeline {
                 string(credentialsId: 'WEATHERAPP_DB_PASSWORD', 
                 variable: 'DB_PASSWORD')]) {
 
-                    echo "REDIS_USER ${REDIS_USER}"
+                    // echo "REDIS_USER ${REDIS_USER}"
                     echo "REDIS_PASSWORD ${REDIS_PASSWORD}"
                     echo "APIKEY ${APIKEY}"
                     echo "MYSQL_ROOT_PASSWORD ${MYSQL_ROOT_PASSWORD}"
