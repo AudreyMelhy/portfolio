@@ -18,7 +18,7 @@ pipeline {
     }
     parameters {
         string(name: 'BRANCH_NAME', defaultValue: 'main', description: '')
-        // string(name: 'UI_IMAGE_TAG', defaultValue: 'latest', description: '')
+        string(name: 'IMAGE_TAG', defaultValue: 'latest', description: '')
         // string(name: 'AUTH_IMAGE_TAG', defaultValue: 'latest', description: '')
         // string(name: 'WEATHER_IMAGE_TAG', defaultValue: 'latest', description: '')
         // string(name: 'REDIS_IMAGE_TAG', defaultValue: 'latest', description: '')
