@@ -54,7 +54,7 @@ pipeline {
                 dir("${WORKSPACE}/app/code") {
                     script {
                         withSonarQubeEnv('SonarScanner') {
-                            sh "sonar-scanner"
+                            sh "sonar"
                             // sh "sonar-scanner --version"
                         }
                     }
