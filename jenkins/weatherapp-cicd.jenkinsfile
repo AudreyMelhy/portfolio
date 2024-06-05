@@ -1,0 +1,261 @@
+pipeline {
+    agent {
+        label 'SERVER01'
+    }
+    triggers {
+        githubPush()
+    }
+    environment {
+        DOCKER_HUB_REGISTRY = "s5audrey"
+        DOCKER_CREDENTIAL_ID = 'audreymelhy-docker-hub-auth'
+    }
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '7'))
+        skipDefaultCheckout(true)
+        disableConcurrentBuilds()
+        timeout(time: 30, unit: 'MINUTES')
+        timestamps()
+    }
+    parameters {
+        string(name: 'BRANCH_NAME', defaultValue: 'main', description: '')
+        string (name: 'UI_IMAGE_VERSION', defaultValue: 'latest', description: '')
+        string (name: 'AUTH_IMAGE_VERSION', defaultValue: 'latest', description: '')
+        string (name: 'WEATHER_IMAGE_VERSION', defaultValue: 'latest', description: '')
+        string (name: 'REDIS_IMAGE_VERSION', defaultValue: 'latest', description: '')
+        string (name: 'DB_IMAGE_VERSION', defaultValue: 'latest', description: '')
+    }
+    stages {
+        stage('Sanity Check') {
+            steps {
+                script{
+                   sanity_check() 
+                }
+            }
+        }
+        stage('Checkout') {
+            steps {
+                dir("${WORKSPACE}/app") {
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: "*/${params.BRANCH_NAME}"]],
+                        doGenerateSubmoduleConfigurations: false,
+                        extensions: [[$class: 'LocalBranch']],
+                        submoduleCfg: [],
+                        userRemoteConfigs: [[
+                            url: 'https://github.com/AudreyMelhy/the-weather-app.git',
+                            credentialsId: 'audrey-github-auth'
+                        ]]
+                    ])
+                }
+            }
+        }
+        stage('Building Sonar Image') {
+            steps {
+                script {
+                    dir("${WORKSPACE}/app/sonar-scanner") {
+                        sh """
+                        docker build -t ${env.DOCKER_HUB_REGISTRY}/weatherapp-sonar-scanner:${params.IMAGE_TAG} .
+
+                        """
+                    }
+                }
+            }
+        }
+        // stage('SonarQube analysis') {
+        //     steps {
+        //         script {
+        //             dir("${WORKSPACE}/app") {
+        //                 docker.image("s5audrey/weatherapp-sonar-scanner:latest").inside('-u 0:0') {
+        //                     withSonarQubeEnv('SonarScanner') {
+        //                         sh """
+        //                             ls -l 
+        //                             pwd
+        //                             sonar-scanner --version
+        //                             // sonar-scanner
+        //                         """
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
+
+        stage('Building Auth') {
+            steps {
+                script {
+                    dir("${WORKSPACE}/app/code/auth") {
+                        sh """
+                            docker build -t ${env.DOCKER_HUB_REGISTRY}/weatherapp-auth:${params.AUTH_IMAGE_VERSION} .                        
+                        """
+                    }
+                }
+            }
+        }
+        stage('Building db') {
+            steps {
+                script {
+                    dir("${WORKSPACE}/app/code/db") {
+                        sh """
+                            docker build -t ${env.DOCKER_HUB_REGISTRY}/weatherapp-db:${params.DB_IMAGE_VERSION} .
+                        """
+                    }
+                }
+            }
+        }
+        stage('Building redis') {
+            steps {
+                script {
+                    dir("${WORKSPACE}/app/code/redis") {
+                        sh """
+                            docker build -t ${env.DOCKER_HUB_REGISTRY}/weatherapp-redis:${params.REDIS_IMAGE_VERSION} .                     
+                        """
+                    }
+                }
+            }
+        }
+        stage('Building ui') {
+            steps {
+                script {
+                    dir("${WORKSPACE}/app/code/ui") {
+                        sh """
+                            docker build -t ${env.DOCKER_HUB_REGISTRY}/weatherapp-ui:${params.UI_IMAGE_VERSION} .                     
+                        """
+                    }
+                }
+            }
+        }
+        stage('Building weather') {
+            steps {
+                script {
+                    dir("${WORKSPACE}/app/code/weather") {
+                        sh """
+                            docker build -t ${env.DOCKER_HUB_REGISTRY}/weatherapp-weather:${params.WEATHER_IMAGE_VERSION} .                  
+                        """
+                    }
+                }
+            }
+        }
+        stage('Login to Docker Hub') {
+            steps {
+                script {
+                    // Login to Docker Hub
+                    withCredentials([usernamePassword(credentialsId: 'audreymelhy-docker-hub-auth', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh """
+                            docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+                        """    
+                    }
+                }
+            }
+        }        
+        stage('Pushing images to dockerhub') {
+            steps {
+                script {
+                    dir("${WORKSPACE}/app/code") {
+                        sh """
+                            docker push ${env.DOCKER_HUB_REGISTRY}/weatherapp-weather:${params.WEATHER_IMAGE_VERSION}
+                            docker push ${env.DOCKER_HUB_REGISTRY}/weatherapp-ui:${params.UI_IMAGE_VERSION}
+                            docker push ${env.DOCKER_HUB_REGISTRY}/weatherapp-redis:${params.REDIS_IMAGE_VERSION}
+                            docker push ${env.DOCKER_HUB_REGISTRY}/weatherapp-auth:${params.AUTH_IMAGE_VERSION}
+                            docker push ${env.DOCKER_HUB_REGISTRY}/weatherapp-db:${params.DB_IMAGE_VERSION}
+                           
+                        """
+                    }
+                }
+            }
+        }
+        stage('Set variables') {
+            steps {
+                script {
+                     dir("${WORKSPACE}/app/docker-stack") {
+                        withCredentials([
+                        usernamePassword(credentialsId: 'weatherapp-redis-auth', 
+                        usernameVariable: 'REDIS_USERNAME', 
+                        passwordVariable: 'REDIS_PASSWORD'),
+
+                        string(credentialsId: 'WEATHERAPP_APIKEY', 
+                        variable: 'APIKEY'),
+
+                        string(credentialsId: 'weatherapp-mysql-auth',  
+                        variable: 'MYSQL_ROOT_PASSWORD'),
+
+                        string(credentialsId: 'weatherapp-db-auth',
+                        variable: 'DB_PASSWORD')]) {
+                            settingUpVariable()
+                        }
+                     }
+                }
+            }
+        }
+        stage("Pulling Images From Docker Hub"){
+             steps {
+              withCredentials([
+                usernamePassword(credentialsId: 'audreymelhy-docker-hub-auth', 
+                usernameVariable: 'DOCKER_HUB_USERNAME', 
+                passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
+                  sh """
+                    docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+                  """
+                  pullImages()
+                }
+            }
+        }
+        stage('Clean Up') {
+            steps {
+                script {
+                    dir("${WORKSPACE}/code/app") {
+                        sh """
+                            rm -rf *
+                        """
+                    }
+                }
+            }
+        }
+    }
+    post {
+        success {
+            slackSend(
+                color: '#2EB67D',
+                channel: 'audrey-perso', 
+                message: "*Weather app Project Build Status*" +
+                "\n Project Name: Weather app" +
+                "\n Job Name: ${env.JOB_NAME}" +
+                "\n Build number: ${currentBuild.displayName}" +
+                "\n Build Status : *SUCCESS*" +
+                "\n Build url : ${env.BUILD_URL}"
+            )
+        }
+        failure {
+            slackSend(
+                color: '#E01E5A',
+                channel: 'audrey-perso',  
+                message: "*Weather app Project Build Status*" +
+                "\n Project Name: Weather app" +
+                "\n Job Name: ${env.JOB_NAME}" +
+                "\n Build number: ${currentBuild.displayName}" +
+                "\n Build Status : *FAILED*" +
+                "\n Build User : *AudreyM*" +
+                "\n Action : Please check the console output to fix this job IMMEDIATELY" +
+                "\n Build url : ${env.BUILD_URL}"
+            )
+        }
+        unstable {
+            slackSend(
+                color: '#ECB22E',
+                channel: 'audrey-perso', 
+                message: "*Weather app Project Build Status*" +
+                "\n Project Name: Weather app" +
+                "\n Job Name: ${env.JOB_NAME}" +
+                "\n Build number: ${currentBuild.displayName}" +
+                "\n Build Status : *UNSTABLE*" +
+                "\n Action : Please check the console output to fix this job IMMEDIATELY" +
+                "\n Build url : ${env.BUILD_URL}"
+            )
+        }   
+    }
+}
+def sanity_check() {
+    if (params.BRANCH_NAME.isEmpty()){
+       echo "The parameter BRANCH_NAME is not set"
+       sh 'exit 2'
+   } 
+}
