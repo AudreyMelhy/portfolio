@@ -18,11 +18,11 @@ pipeline {
     }
     parameters {
         string(name: 'BRANCH_NAME', defaultValue: 'main', description: '')
-        string(name: 'IMAGE_TAG', defaultValue: 'latest', description: '')
-        // string(name: 'AUTH_IMAGE_TAG', defaultValue: 'latest', description: '')
-        // string(name: 'WEATHER_IMAGE_TAG', defaultValue: 'latest', description: '')
-        // string(name: 'REDIS_IMAGE_TAG', defaultValue: 'latest', description: '')
-        // string(name: 'DB_IMAGE_TAG', defaultValue: 'latest', description: '')
+        string(name: 'UI_IMAGE_TAG', defaultValue: 'latest', description: '')
+        string(name: 'AUTH_IMAGE_TAG', defaultValue: 'latest', description: '')
+        string(name: 'WEATHER_IMAGE_TAG', defaultValue: 'latest', description: '')
+        string(name: 'REDIS_IMAGE_TAG', defaultValue: 'latest', description: '')
+        string(name: 'DB_IMAGE_TAG', defaultValue: 'latest', description: '')
     }
     stages {
         stage('Sanity Check') {
@@ -112,8 +112,7 @@ pipeline {
                 script {
                     dir("${WORKSPACE}/app/code/auth") {
                         sh """
-                            docker build -t ${env.DOCKER_HUB_REGISTRY}/weatherapp-auth:${params.IMAGE_TAG} .
-                           
+                            docker build -t ${env.DOCKER_HUB_REGISTRY}/weatherapp-auth:${params.AUTH_IMAGE_TAG} .                        
                         """
                     }
                 }
@@ -124,7 +123,7 @@ pipeline {
                 script {
                     dir("${WORKSPACE}/app/code/db") {
                         sh """
-                            docker build -t ${env.DOCKER_HUB_REGISTRY}/weatherapp-db:${params.IMAGE_TAG} .
+                            docker build -t ${env.DOCKER_HUB_REGISTRY}/weatherapp-db:${params.DB_IMAGE_TAG} .
                         """
                     }
                 }
@@ -135,7 +134,7 @@ pipeline {
                 script {
                     dir("${WORKSPACE}/app/code/redis") {
                         sh """
-                            docker build -t ${env.DOCKER_HUB_REGISTRY}/weatherapp-redis:${params.IMAGE_TAG} .                     
+                            docker build -t ${env.DOCKER_HUB_REGISTRY}/weatherapp-redis:${params.REDIS_IMAGE_TAG} .                     
                         """
                     }
                 }
@@ -146,7 +145,7 @@ pipeline {
                 script {
                     dir("${WORKSPACE}/app/code/ui") {
                         sh """
-                            docker build -t ${env.DOCKER_HUB_REGISTRY}/weatherapp-ui:${params.IMAGE_TAG} .                     
+                            docker build -t ${env.DOCKER_HUB_REGISTRY}/weatherapp-ui:${params.UI_IMAGE_TAG} .                     
                         """
                     }
                 }
@@ -157,7 +156,7 @@ pipeline {
                 script {
                     dir("${WORKSPACE}/app/code/weather") {
                         sh """
-                            docker build -t ${env.DOCKER_HUB_REGISTRY}/weatherapp-weather:${params.IMAGE_TAG} .                  
+                            docker build -t ${env.DOCKER_HUB_REGISTRY}/weatherapp-weather:${params.WEATHER_IMAGE_TAG} .                  
                         """
                     }
                 }
@@ -179,9 +178,9 @@ pipeline {
         stage('Pushing images to dockerhub') {
             steps {
                 script {
-                    dir("${WORKSPACE}/app/code/weather") {
+                    dir("${WORKSPACE}/app/code") {
                         sh """
-                            ls -la
+                            docker push ${env.DOCKER_HUB_REGISTRY}/weatherapp-weather:${params.WEATHER_IMAGE_TAG}
                            
                         """
                     }
