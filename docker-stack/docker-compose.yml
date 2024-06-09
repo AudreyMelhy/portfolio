@@ -10,13 +10,13 @@ services:
     environment:
       # MYSQL_ROOT_PASSWORD: WEATHER_APP_MYSQL_ROOT_PASSWORD
       MYSQL_ROOT_PASSWORD: my-secret-pw
-      MYSQL_ROOT_USER: weatherapp
-      DB_HOST: db
-      DB_PASSWORD: my-secret-pw
+      MYSQL_DATABASE: weatherapp
+      MYSQL_USER: weatherapp
+      MYSQL_PASSWORD: weatherapp
       # DB_HOST: weatherapp
       # DB_PASSWORD: WEATHER_APP_DB_PASSWORD
     volumes:
-      - db-data:/var/lib/mysql
+      - /db-data:/var/lib/mysql
     networks:
       - weatherapp
     restart: always
@@ -155,7 +155,7 @@ services:
     container_name: weatherapp-auth
     image:  s5audrey/weatherapp-auth:latest
     ports:
-      - "8080:8080"
+      - "8899:8080"
     environment:
       DB_HOST: db
       DB_PASSWORD: my-secret-pw

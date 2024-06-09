@@ -18,6 +18,7 @@ pipeline {
     }
     parameters {
         string(name: 'BRANCH_NAME', defaultValue: 'main', description: '')
+        string (name: 'SONAR_IMAGE_VERSION', defaultValue: 'latest', description: '')
         string (name: 'UI_IMAGE_VERSION', defaultValue: 'latest', description: '')
         string (name: 'AUTH_IMAGE_VERSION', defaultValue: 'latest', description: '')
         string (name: 'WEATHER_IMAGE_VERSION', defaultValue: 'latest', description: '')
@@ -54,31 +55,31 @@ pipeline {
                 script {
                     dir("${WORKSPACE}/app/sonar-scanner") {
                         sh """
-                        docker build -t ${env.DOCKER_HUB_REGISTRY}/weatherapp-sonar-scanner:${params.IMAGE_TAG} .
+                        docker build -t ${env.DOCKER_HUB_REGISTRY}/weatherapp-sonar-scanner:${params.SONAR_IMAGE_VERSION} .
 
                         """
                     }
                 }
             }
         }
-        // stage('SonarQube analysis') {
-        //     steps {
-        //         script {
-        //             dir("${WORKSPACE}/app") {
-        //                 docker.image("s5audrey/weatherapp-sonar-scanner:latest").inside('-u 0:0') {
-        //                     withSonarQubeEnv('SonarScanner') {
-        //                         sh """
-        //                             ls -l 
-        //                             pwd
-        //                             sonar-scanner --version
-        //                             // sonar-scanner
-        //                         """
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+        stage('SonarQube analysis') {
+            steps {
+                script {
+                    dir("${WORKSPACE}/app") {
+                        docker.image("s5audrey/weatherapp-sonar-scanner:latest").inside('-u 0:0') {
+                            withSonarQubeEnv('SonarScanner') {
+                                sh """
+                                    ls -l 
+                                    pwd
+                                    sonar-scanner --version
+                                    // sonar-scanner
+                                """
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         stage('Building Auth') {
             steps {
