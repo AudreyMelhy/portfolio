@@ -1,0 +1,12 @@
+pipeline {
+    agent { label 'SERVER01' }
+    stages {
+        stage('SSH to Remote Host') {
+            steps {
+                sshagent(['audrey-github-auth']) {
+                    sh 'ssh -o StrictHostKeyChecking=no s5audrey@server2.anomicatech.com "hostname"'
+                }
+            }
+        }
+    }
+}

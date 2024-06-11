@@ -38,8 +38,16 @@ aws ecr get-login-password --region us-east-1 | docker login --username AWS --pa
  ```
 
  # to forcefully stop and remove containers
+
  ```
   docker rm -f $(docker ps -aq)
+```
+
+# to delete all networks and images
+```
+  docker network prune -f
+  docker rmi -f $(docker images -q) # to delete all images
+  docker rmi -f $(docker images -q)
   ```
 # to clear docker cache by cleaning up unused build cache and related artifacts specifically related to Docker BuildKit.
 docker buildx prune

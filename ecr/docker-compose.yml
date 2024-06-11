@@ -2,7 +2,7 @@ version: '3.8'
 services:
   db:
     container_name: weatherapp-db
-    image: s5audrey/weatherapp-db:latest # Specify the desired image tag here
+    image: 763237209150.dkr.ecr.us-east-1.amazonaws.com/weatherapp-db:develop # Specify the desired image tag here
     ports:
       - "3306:3306"
     expose:
@@ -20,14 +20,14 @@ services:
 
   redis:
     container_name: weatherapp-redis
-    image: s5audrey/weatherapp-redis:latest # Specify the desired image tag here
+    image: 763237209150.dkr.ecr.us-east-1.amazonaws.com/weatherapp-redis:develop # Specify the desired image tag here
     ports:
       - "6379:6379"
     expose:
       - "6379"
     environment:
-      REDIS_USER: WEATHER_APP_REDIS_PASSWORD_USERNAME
-      REDIS_PASSWORD: WEATHER_APP_REDIS_PASSWORD
+      REDIS_USER: redis
+      REDIS_PASSWORD: redis
     volumes:
       - ./redis-data:/data
     networks:
@@ -36,9 +36,9 @@ services:
 
   ui:
     container_name: weatherapp-ui
-    image: s5audrey/weatherapp-ui:latest # Specify the desired image tag here
+    image: 763237209150.dkr.ecr.us-east-1.amazonaws.com/weatherapp-ui:develop # Specify the desired image tag here
     ports:
-      - "3000:3000"
+      - "3099:3000"
     expose:
       - "3000"
     environment:
@@ -54,9 +54,9 @@ services:
 
   weather:
     container_name: weatherapp-weather
-    image: s5audrey/weatherapp-weather:latest # Specify the desired image tag here
+    image: 763237209150.dkr.ecr.us-east-1.amazonaws.com/weatherapp-weather:develop # Specify the desired image tag here
     ports:
-      - "5000:5000"
+      - "5055:5000"
     expose:
       - "5000"
     environment:
@@ -67,7 +67,7 @@ services:
 
   auth:
     container_name: weatherapp-auth
-    image: s5audrey/weatherapp-auth:latest # Specify the desired image tag here
+    image: 763237209150.dkr.ecr.us-east-1.amazonaws.com/weatherapp-auth:develop # Specify the desired image tag here
     ports:
       - "8070:8080"
     environment:
