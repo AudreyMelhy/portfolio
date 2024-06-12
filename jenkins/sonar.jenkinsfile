@@ -2,6 +2,10 @@ pipeline {
     agent {
         label 'SERVER02'
     }
+    triggers {
+        // This trigger is for GitHub webhooks
+        githubPush()
+    }
     options {
         buildDiscarder(logRotator(numToKeepStr: '7'))
         skipDefaultCheckout(true)
