@@ -95,23 +95,23 @@ pipeline {
             }
         }
 
-    //     stage('Create sonar-project.properties') {
-    //         steps {
-    //             dir("${WORKSPACE}/app/code") {
-    //                 script {
-    //                     def sonarProjectPropertiesContent = """
-    //                         sonar.host.url=https://sonarqube.devopseasylearning.uk/
-    //                         sonar.projectKey=my-sonar-project
-    //                         sonar.projectName=my-sonar-project
-    //                         sonar.sources=.
-    //                         sonar.projectVersion=1.1.1
-    //                         qualitygate.wait=true
-    //                     """
-    //                     writeFile file: 'sonar-project.properties', text: sonarProjectPropertiesContent
-    //                 }
-    //             }
-    //         }
-    //     }
+        stage('Create sonar-project.properties') {
+            steps {
+                dir("${WORKSPACE}/app/code") {
+                    script {
+                        def sonarProjectPropertiesContent = """
+                            sonar.host.url=https://sonarqube.devopseasylearning.uk/
+                            sonar.projectKey=my-sonar-project
+                            sonar.projectName=my-sonar-project
+                            sonar.sources=.
+                            sonar.projectVersion=1.1.1
+                            qualitygate.wait=true
+                        """
+                        writeFile file: 'sonar-project.properties', text: sonarProjectPropertiesContent
+                    }
+                }
+            }
+        }
     //     stage('SonarQube analysis') {
     //         def scannerHome = tool 'SonarScanner';
     //         steps {
