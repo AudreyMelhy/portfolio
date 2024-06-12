@@ -137,4 +137,3 @@ pipeline {
 }    
 
 
-http://server3.anomicatech.com:8080/job/sonar.jenkinsfile/build?token=squ_07981c0172e41e3806a1215a51d535ceb0a24a4e
