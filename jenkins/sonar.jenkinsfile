@@ -16,6 +16,7 @@ pipeline {
     environment {
         DOCKER_HUB_REGISTRY = "s5audrey"
         DOCKER_CREDENTIAL_ID = 'audreymelhy-docker-hub-auth'
+        SONARQUBE_SERVER = 'https://sonarqube.ektechsoftwaresolution.com'
     }
     // environment {
     //     // Define the password for sudo operations
@@ -85,7 +86,7 @@ pipeline {
                 script {
                     dir("${WORKSPACE}/app/code") {
                         docker.image("${env.DOCKER_HUB_REGISTRY}/weatherapp-sonar-scanner:${params.SONAR_IMAGE_VERSION}").inside('-u 0:0') {
-                            withSonarQubeEnv('SonarScanner') {
+                            withSonarQubeEnv(SONARQUBE_SERVER) {
                                 sh """
                                     ls -l 
                                     pwd
