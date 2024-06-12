@@ -95,44 +95,44 @@ pipeline {
             }
         }
 
-        stage('Create sonar-project.properties') {
-            steps {
-                dir("${WORKSPACE}/app/code") {
-                    script {
-                        def sonarProjectPropertiesContent = """
-                            sonar.host.url=https://sonarqube.devopseasylearning.uk/
-                            sonar.projectKey=my-sonar-project
-                            sonar.projectName=my-sonar-project
-                            sonar.sources=.
-                            sonar.projectVersion=1.1.1
-                            qualitygate.wait=true
-                        """
-                        writeFile file: 'sonar-project.properties', text: sonarProjectPropertiesContent
-                    }
-                }
-            }
-        }
-        stage('SonarQube analysis') {
-            def scannerHome = tool 'SonarScanner';
-            steps {
-                script {
-                    dir("${WORKSPACE}/app/code") {
-                        docker.image("${env.DOCKER_HUB_REGISTRY}/weatherapp-sonar-scanner:${params.SONAR_IMAGE_VERSION}").inside('-u 0:0') {
-                            withSonarQubeEnv(SONARQUBE_SERVER) {
-                                sh """
-                                    ${scannerHome}/bin/sonar-scanner
-                                    ls -l 
-                                    pwd
-                                    echo "SonarScanner binaries are located at: /usr/local/bin/sonar-scanner"
-                                    sonar-scanner --version
-                                    sonar-scanner
-                                """
-                            }
-                        }
-                    }
-                }
-            }
-        }
+    //     stage('Create sonar-project.properties') {
+    //         steps {
+    //             dir("${WORKSPACE}/app/code") {
+    //                 script {
+    //                     def sonarProjectPropertiesContent = """
+    //                         sonar.host.url=https://sonarqube.devopseasylearning.uk/
+    //                         sonar.projectKey=my-sonar-project
+    //                         sonar.projectName=my-sonar-project
+    //                         sonar.sources=.
+    //                         sonar.projectVersion=1.1.1
+    //                         qualitygate.wait=true
+    //                     """
+    //                     writeFile file: 'sonar-project.properties', text: sonarProjectPropertiesContent
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     stage('SonarQube analysis') {
+    //         def scannerHome = tool 'SonarScanner';
+    //         steps {
+    //             script {
+    //                 dir("${WORKSPACE}/app/code") {
+    //                     docker.image("${env.DOCKER_HUB_REGISTRY}/weatherapp-sonar-scanner:${params.SONAR_IMAGE_VERSION}").inside('-u 0:0') {
+    //                         withSonarQubeEnv(SONARQUBE_SERVER) {
+    //                             sh """
+    //                                 ${scannerHome}/bin/sonar-scanner
+    //                                 ls -l 
+    //                                 pwd
+    //                                 echo "SonarScanner binaries are located at: /usr/local/bin/sonar-scanner"
+    //                                 sonar-scanner --version
+    //                                 sonar-scanner
+    //                             """
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
     }
 }    
 
