@@ -17,10 +17,10 @@ pipeline {
         DOCKER_HUB_REGISTRY = "s5audrey"
         DOCKER_CREDENTIAL_ID = 'audreymelhy-docker-hub-auth'
     }
-    environment {
-        // Define the password for sudo operations
-        SUDO_PASSWORD = credentials('jenkins-auth')
-    }
+    // environment {
+    //     // Define the password for sudo operations
+    //     SUDO_PASSWORD = credentials('jenkins-auth')
+    // }
     parameters {
         string(name: 'BRANCH_NAME', defaultValue: 'main', description: '')
         string(name: 'SONAR_IMAGE_VERSION}', defaultValue: 'latest', description: '') 
