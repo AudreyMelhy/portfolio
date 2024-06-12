@@ -39,24 +39,15 @@ pipeline {
                 }
             }
         }  
-        stage('Install SonarQube') {
+        stage('Building Sonar Image') {
             steps {
                 script {
-                    sh """
-                        echo "${SUDO_PASSWORD}" | sudo -S apt update -y
-                        echo "${SUDO_PASSWORD}" | sudo -S apt install nodejs npm wget unzip -y
+                    dir("${WORKSPACE}/app/sonar-scanner") {
+                        sh """
+                        docker build -t ${env.DOCKER_HUB_REGISTRY}/weatherapp-sonar-scanner:${params.SONAR_IMAGE_VERSION} .
 
-                        wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_VERSION}-linux.zip
-                        unzip sonar-scanner-cli-${SONAR_VERSION}-linux.zip
-                        sudo mv sonar-scanner-cli-${SONAR_VERSION}-linux sonar-scanner
-                        echo "${SUDO_PASSWORD}" | sudo -S rm -rf /var/opt/sonar-scanner || true
-                        echo "${SUDO_PASSWORD}" | sudo -S mv sonar-scanner /var/opt
-                        echo "${SUDO_PASSWORD}" | sudo -S rm -rf /usr/local/bin/sonar-scanner || true
-                        # /var/opt/sonar-scanner/bin/sonar-scanner --version (absolute path to the binaries)
-                        #OR SEE BELOW
-                        echo "${SUDO_PASSWORD}" | sudo -S ln -s /var/opt/sonar-scanner/bin/sonar-scanner /usr/local/bin || true
-                        sonar-scanner -v
-                    """
+                        """
+                    }
                 }
             }
         }
