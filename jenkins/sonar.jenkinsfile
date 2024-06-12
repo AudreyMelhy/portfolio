@@ -81,13 +81,46 @@ pipeline {
                 }
             }
         }
+        stage('Check and remove existing sonar-project.properties') {
+            steps {
+                script {
+                    def propertiesFile = "${WORKSPACE}/app/code/sonar-project.properties"
+                    if (fileExists(propertiesFile)) {
+                        echo "Found existing sonar-project.properties file. Removing..."
+                        sh "rm -rf ${propertiesFile}"
+                    } else {
+                        echo "No existing sonar-project.properties file found."
+                    }
+                }
+            }
+        }
+
+        stage('Create sonar-project.properties') {
+            steps {
+                dir("${WORKSPACE}/app/code") {
+                    script {
+                        def sonarProjectPropertiesContent = """
+                            sonar.host.url=https://sonarqube.devopseasylearning.uk/
+                            sonar.projectKey=my-sonar-project
+                            sonar.projectName=my-sonar-project
+                            sonar.sources=.
+                            sonar.projectVersion=1.1.1
+                            qualitygate.wait=true
+                        """
+                        writeFile file: 'sonar-project.properties', text: sonarProjectPropertiesContent
+                    }
+                }
+            }
+        }
         stage('SonarQube analysis') {
+            def scannerHome = tool 'SonarScanner';
             steps {
                 script {
                     dir("${WORKSPACE}/app/code") {
                         docker.image("${env.DOCKER_HUB_REGISTRY}/weatherapp-sonar-scanner:${params.SONAR_IMAGE_VERSION}").inside('-u 0:0') {
                             withSonarQubeEnv(SONARQUBE_SERVER) {
                                 sh """
+                                    ${scannerHome}/bin/sonar-scanner
                                     ls -l 
                                     pwd
                                     echo "SonarScanner binaries are located at: /usr/local/bin/sonar-scanner"
@@ -102,3 +135,6 @@ pipeline {
         }
     }
 }    
+
+
+http://server3.anomicatech.com:8080/job/sonar.jenkinsfile/build?token=squ_07981c0172e41e3806a1215a51d535ceb0a24a4e
