@@ -112,6 +112,17 @@ pipeline {
                 }
             }
         }
+        stage('SonarQube Analysis') {
+            steps {
+                dir("${WORKSPACE}/app/code") {
+                    script {
+                        withSonarQubeEnv('SonarScanner') {
+                            sh "sonar-scanner"
+                        }
+                    }
+                }
+            }
+        }
     //     stage('SonarQube analysis') {
     //         def scannerHome = tool 'SonarScanner';
     //         steps {
