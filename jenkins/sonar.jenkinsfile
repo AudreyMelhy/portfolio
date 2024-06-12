@@ -19,7 +19,7 @@ pipeline {
     }
     parameters {
         string(name: 'BRANCH_NAME', defaultValue: 'main', description: '')
-        string(name: 'SONAR_VERSION', defaultValue: '5.0.1.3006', description: '') 
+        string(name: 'SONAR_IMAGE_VERSION}', defaultValue: 'latest', description: '') 
     }
     stages {
         stage('Checkout') {
@@ -47,6 +47,24 @@ pipeline {
                         docker build -t ${env.DOCKER_HUB_REGISTRY}/weatherapp-sonar-scanner:${params.SONAR_IMAGE_VERSION} .
 
                         """
+                    }
+                }
+            }
+        }
+        stage('SonarQube analysis') {
+            steps {
+                script {
+                    dir("${WORKSPACE}/app/code") {
+                        docker.image("s5audrey/weatherapp-sonar-scanner:latest").inside('-u 0:0') {
+                            withSonarQubeEnv('SonarScanner') {
+                                sh """
+                                    ls -l 
+                                    pwd
+                                    sonar-scanner --version
+                                    sonar-scanner
+                                """
+                            }
+                        }
                     }
                 }
             }
