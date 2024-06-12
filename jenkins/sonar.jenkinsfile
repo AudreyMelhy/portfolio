@@ -1,0 +1,57 @@
+pipeline {
+    agent {
+        label 'SERVER01'
+    }
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '7'))
+        skipDefaultCheckout(true)
+        disableConcurrentBuilds()
+        timeout(time: 1, unit: 'MINUTES')
+        timestamps()
+    }
+    parameters {
+        string(name: 'BRANCH_NAME', defaultValue: 'main', description: '')
+        string(name: 'SONAR_VERSION', defaultValue: '5.0.1.3006', description: '')
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                dir("${WORKSPACE}/app") {
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: "*/${params.BRANCH_NAME}"]],
+                        doGenerateSubmoduleConfigurations: false,
+                        extensions: [[$class: 'LocalBranch']],
+                        submoduleCfg: [],
+                        userRemoteConfigs: [[
+                            url: 'https://github.com/AudreyMelhy/the-weather-app.git',
+                            credentialsId: 'audrey-github-auth'
+                        ]]
+                    ])
+                }
+            }
+        }
+    }    
+    //     stage ('Install SonarQube') {
+    //         steps {
+    //             script {
+    //                 sh """
+    //                     sudo apt update -y
+    //                     sudo apt install nodejs npm wget unzip -y
+
+    //                     wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${params.SONAR_VERSION}-linux.zip
+    //                     unzip sonar-scanner-cli-${params.SONAR_VERSION}-linux.zip
+    //                     sudo mv sonar-scanner-cli-${params.SONAR_VERSION}-linux sonar-scanner
+    //                     sudo rm -rf /var/opt/sonar-scanner || true
+    //                     sudo mv sonar-scanner /var/opt
+    //                     sudo rm -rf /usr/local/bin/sonar-scanner || true
+    //                     # /var/opt/sonar-scanner/bin/sonar-scanner --version (absolute path to the binaries)
+    //                     #OR SEE BELOW
+    //                     sudo ln -s /var/opt/sonar-scanner/bin/sonar-scanner /usr/local/bin || true
+    //                     sonar-scanner -v
+    //                 """
+    //             }
+    //         }
+    //     }
+    // }
+}    
